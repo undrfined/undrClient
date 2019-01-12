@@ -1,0 +1,443 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="System.Xml"#>
+<#@ import namespace="System.Xml" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+<#
+string path = this.Host.ResolvePath("");
+XmlDocument doc = new XmlDocument();
+doc.Load(path + @"\MCPE Protocol.xml");
+
+#>
+//
+// WARNING: T4 GENERATED CODE - DO NOT EDIT
+// 
+
+using System;
+using System.Net;
+using System.Numerics;
+using System.Threading;
+using MiNET.Utils; 
+using MiNET.Items;
+using MiNET.Crafting;
+using little = MiNET.Utils.Int24; // friendly name
+using LongString = System.String;
+
+namespace MiNET.Net
+{
+	public interface IMcpeMessageHandler
+	{
+
+		void Disconnect(string reason, bool sendDisconnect = true);
+
+<#	
+
+foreach (XmlNode pdu in doc.SelectNodes("//pdu[not(@namespace='raknet') and @client='true']"))
+{
+#>
+		void Handle<#= CodeTypeName(pdu.Attributes["name"].Value) #>(<#= CodeTypeName(pdu.Attributes["name"].Value) #> message);
+<#	
+} // foreach
+#>
+	}
+
+	public class PackageFactory
+	{
+		public static Package CreatePackage(byte messageId, byte[] buffer, string ns)
+		{
+			Package package = null; 
+			if(ns == "raknet") {
+				switch (messageId)
+				{
+<#	
+
+foreach (XmlNode pdu in doc.SelectNodes("//pdu[@namespace='raknet']"))
+{
+#>
+					case <#= pdu.Attributes["id"].Value #>:
+						package = <#= CodeTypeName(pdu.Attributes["name"].Value) #>.CreateObject();
+						//package.Timer.Start();
+						package.Decode(buffer);
+						return package;
+<#	
+} // foreach
+#>
+				}
+			} else if(ns == "ftl") {
+				switch (messageId)
+				{
+<#	
+foreach (XmlNode pdu in doc.SelectNodes("//pdu[@namespace='ftl']"))
+{
+#>
+					case <#= pdu.Attributes["id"].Value #>:
+						package = <#= CodeTypeName(pdu.Attributes["name"].Value) #>.CreateObject();
+						//package.Timer.Start();
+						package.Decode(buffer);
+						return package;
+<#	
+} // foreach
+#>
+				}
+			} else {
+
+				switch (messageId)
+				{
+<#	
+
+foreach (XmlNode pdu in doc.SelectNodes("//pdu[not(@namespace='raknet') and not(@namespace='ftl')]"))
+{
+#>
+					case <#= pdu.Attributes["id"].Value #>:
+						package = <#= CodeTypeName(pdu.Attributes["name"].Value) #>.CreateObject();
+						//package.Timer.Start();
+						package.Decode(buffer);
+						return package;
+<#	
+} // foreach
+#>
+				}
+			}
+
+			return null;
+		}
+	}
+
+<#
+
+
+Dictionary<string, Tuple<string, string>> constantsLoopup = new Dictionary<string, Tuple<string, string>>();
+foreach (XmlNode constant in doc.SelectNodes("//constant"))
+{
+	var attributes = constant.Attributes;
+	constantsLoopup.Add(attributes["id"].Value, new Tuple<string, string>(attributes["type"].Value, attributes["value"].Value));
+}
+
+
+foreach (XmlNode pdu in doc.SelectNodes("//pdu"))
+{
+	string baseType = pdu.Attributes["online"] == null? "Package": pdu.Attributes["online"].Value.Equals(Boolean.TrueString, StringComparison.InvariantCultureIgnoreCase)?"ConnectedPackage":"Package";
+#>
+	public partial class <#= CodeTypeName(pdu.Attributes["name"].Value) #> : <#= baseType #><<#= CodeTypeName(pdu.Attributes["name"].Value) #>>
+	{
+<#	
+
+	foreach (XmlNode field in pdu.ChildNodes)
+	{
+		if(field.NodeType != XmlNodeType.Element) continue;
+
+		if (constantsLoopup.ContainsKey(field.Attributes["type"].Value))
+		{
+			string type = constantsLoopup[field.Attributes["type"].Value].Item1;
+			string value = constantsLoopup[field.Attributes["type"].Value].Item2;
+			WriteLine(string.Format("\t\tpublic readonly {0} {1} = new {0}{2}; // = {2};", type, CodeName(field.Attributes["name"].Value), value));
+		} 
+		else if(field.Attributes["type"].Value == "VarInt")
+		{
+			WriteLine(string.Format("\t\tpublic {0} {1}; // = {2};", "int", CodeName(field.Attributes["name"].Value), "null"));
+		}
+		else if(field.Attributes["type"].Value == "UnsignedVarInt")
+		{
+			WriteLine(string.Format("\t\tpublic {0} {1}; // = {2};", "uint", CodeName(field.Attributes["name"].Value), "null"));
+		}
+		else if(field.Attributes["type"].Value == "SignedVarInt")
+		{
+			WriteLine(string.Format("\t\tpublic {0} {1}; // = {2};", "int", CodeName(field.Attributes["name"].Value), "null"));
+		}
+		else if(field.Attributes["type"].Value == "VarLong")
+		{
+			WriteLine(string.Format("\t\tpublic {0} {1}; // = {2};", "long", CodeName(field.Attributes["name"].Value), "null"));
+		}
+		else if(field.Attributes["type"].Value == "SignedVarLong")
+		{
+			WriteLine(string.Format("\t\tpublic {0} {1}; // = {2};", "long", CodeName(field.Attributes["name"].Value), "null"));
+		}
+		else if(field.Attributes["type"].Value == "UnsignedVarLong")
+		{
+			WriteLine(string.Format("\t\tpublic {0} {1}; // = {2};", "long", CodeName(field.Attributes["name"].Value), "null"));
+		}
+		else if(field.Attributes["type"].Value == "Length")
+		{
+			WriteLine(string.Format("\t\tpublic {0} {1}; // = {2};", "int", CodeName(field.Attributes["name"].Value), "null"));
+		}
+		else if(field.Attributes["type"].Value == "ByteArray")
+		{
+			WriteLine(string.Format("\t\tpublic {0} {1}; // = {2};", "byte[]", CodeName(field.Attributes["name"].Value), "null"));
+		}
+		else if(field.Attributes["type"].Value == "FixedString")
+		{
+			WriteLine(string.Format("\t\tpublic {0} {1}; // = {2};", "string", CodeName(field.Attributes["name"].Value), "null"));
+		}
+		else 
+		{
+			WriteLine(string.Format("\t\tpublic {0} {1}; // = {2};", field.Attributes["type"].Value, CodeName(field.Attributes["name"].Value), "null"));
+		} 
+
+	} // foreach
+
+#>
+		public <#= CodeTypeName(pdu.Attributes["name"].Value) #>()
+		{
+			Id = <#= CodeName(pdu.Attributes["id"].Value, true) #>;
+		}
+
+		protected override void EncodePackage()
+		{
+			base.EncodePackage();
+
+			BeforeEncode();
+
+<#	
+	foreach (XmlNode field in pdu.ChildNodes)
+	{
+		if(field.NodeType != XmlNodeType.Element) continue;
+
+		if(field.Attributes["type"].Value == "VarInt")
+		{
+			WriteLine(string.Format("\t\t\tWriteVarInt({0});", CodeName(field.Attributes["name"].Value), field.Attributes["type"].Value));
+
+		}
+		else if(field.Attributes["type"].Value == "UnsignedVarInt")
+		{
+			WriteLine(string.Format("\t\t\tWriteUnsignedVarInt({0});", CodeName(field.Attributes["name"].Value), field.Attributes["type"].Value));
+		}
+		else if(field.Attributes["type"].Value == "SignedVarInt")
+		{
+			WriteLine(string.Format("\t\t\tWriteSignedVarInt({0});", CodeName(field.Attributes["name"].Value), field.Attributes["type"].Value));
+		}
+		else if(field.Attributes["type"].Value == "VarLong")
+		{
+			WriteLine(string.Format("\t\t\tWriteVarLong({0});", CodeName(field.Attributes["name"].Value), field.Attributes["type"].Value));
+		}
+		else if(field.Attributes["type"].Value == "SignedVarLong")
+		{
+			WriteLine(string.Format("\t\t\tWriteSignedVarLong({0});", CodeName(field.Attributes["name"].Value), field.Attributes["type"].Value));
+		}
+		else if(field.Attributes["type"].Value == "UnsignedVarLong")
+		{
+			WriteLine(string.Format("\t\t\tWriteUnsignedVarLong({0});", CodeName(field.Attributes["name"].Value), field.Attributes["type"].Value));
+		}
+		else if(field.Attributes["type"].Value == "Length")
+		{
+			WriteLine(string.Format("\t\t\tWriteLength({0});", CodeName(field.Attributes["name"].Value), field.Attributes["type"].Value));
+		}
+		else if(field.Attributes["type"].Value == "ByteArray")
+		{
+			WriteLine(string.Format("\t\t\tWriteByteArray({0});", CodeName(field.Attributes["name"].Value), field.Attributes["type"].Value));
+		}
+		else if(field.Attributes["type"].Value == "FixedString")
+		{
+			WriteLine(string.Format("\t\t\tWriteFixedString({0});", CodeName(field.Attributes["name"].Value), field.Attributes["type"].Value));
+		}
+		else if(field.Attributes["endianess"] != null && field.Attributes["endianess"].Value == "BE")
+		{
+			WriteLine(string.Format("\t\t\tWriteBe({0});", CodeName(field.Attributes["name"].Value)));
+		}
+		else
+		{
+			WriteLine(string.Format("\t\t\tWrite({0});", CodeName(field.Attributes["name"].Value)));
+		}
+		
+
+			
+	} // foreach
+#>
+
+			AfterEncode();
+		}
+
+		partial void BeforeEncode();
+		partial void AfterEncode();
+
+		protected override void DecodePackage()
+		{
+			base.DecodePackage();
+
+			BeforeDecode();
+
+<#	
+	foreach (XmlNode field in pdu.ChildNodes)
+	{
+		if(field.NodeType != XmlNodeType.Element) continue;
+
+		if (constantsLoopup.ContainsKey(field.Attributes["type"].Value))
+		{
+			string type = constantsLoopup[field.Attributes["type"].Value].Item1;
+			string value = constantsLoopup[field.Attributes["type"].Value].Item2;
+			WriteLine(string.Format("\t\t\tRead{1}({0}.Length);", CodeFieldName(field.Attributes["name"].Value), CodeTypeName(type)));
+		} 
+		else if(field.Attributes["type"].Value == "VarInt")
+		{
+			WriteLine(string.Format("\t\t\t{0} = Read{1}({2});", CodeFieldName(field.Attributes["name"].Value), "VarInt", SafeToString(field.Attributes["size"])));
+		}
+		else if(field.Attributes["type"].Value == "UnsignedVarInt")
+		{
+			WriteLine(string.Format("\t\t\t{0} = Read{1}({2});", CodeFieldName(field.Attributes["name"].Value), "UnsignedVarInt", SafeToString(field.Attributes["size"])));
+		}
+		else if(field.Attributes["type"].Value == "SignedVarInt")
+		{
+			WriteLine(string.Format("\t\t\t{0} = Read{1}({2});", CodeFieldName(field.Attributes["name"].Value), "SignedVarInt", SafeToString(field.Attributes["size"])));
+		}
+		else if(field.Attributes["type"].Value == "VarLong")
+		{
+			WriteLine(string.Format("\t\t\t{0} = Read{1}({2});", CodeFieldName(field.Attributes["name"].Value), "VarLong", SafeToString(field.Attributes["size"])));
+		}
+		else if(field.Attributes["type"].Value == "ByteArray")
+		{
+			WriteLine(string.Format("\t\t\t{0} = Read{1}({2});", CodeFieldName(field.Attributes["name"].Value), "ByteArray", SafeToString(field.Attributes["size"])));
+		}
+		else if(field.Attributes["type"].Value == "FixedString")
+		{
+			WriteLine(string.Format("\t\t\t{0} = Read{1}({2});", CodeFieldName(field.Attributes["name"].Value), "FixedString", SafeToString(field.Attributes["size"])));
+		}
+		else if(field.Attributes["endianess"] != null && field.Attributes["endianess"].Value == "BE")
+		{
+			WriteLine(string.Format("\t\t\t{0} = Read{1}Be({2});", CodeFieldName(field.Attributes["name"].Value), UpperInitial(field.Attributes["type"].Value), SafeToString(field.Attributes["size"])));
+		}
+		else 
+		{
+			WriteLine(string.Format("\t\t\t{0} = Read{1}({2});", CodeFieldName(field.Attributes["name"].Value), UpperInitial(field.Attributes["type"].Value), SafeToString(field.Attributes["size"])));
+		} 
+
+
+	} // foreach
+#>
+
+			AfterDecode();
+		}
+
+		partial void BeforeDecode();
+		partial void AfterDecode();
+
+		protected override void ResetPackage()
+		{
+			base.ResetPackage();
+
+<#
+	foreach (XmlNode field in pdu.SelectNodes("field"))
+	{
+		if(field.NodeType != XmlNodeType.Element) continue;
+
+		if (constantsLoopup.ContainsKey(field.Attributes["type"].Value))
+		{
+			continue;
+		}
+		
+		Write($"\t\t\t{CodeName(field.Attributes["name"].Value)}=default(");
+		 
+		if(field.Attributes["type"].Value == "VarInt")
+		{
+			Write("int");
+		}
+		else if(field.Attributes["type"].Value == "UnsignedVarInt")
+		{
+			Write("uint");
+		}
+		else if(field.Attributes["type"].Value == "SignedVarInt")
+		{
+			Write("int");
+		}
+		else if(field.Attributes["type"].Value == "VarLong")
+		{
+			Write("long");
+		}
+		else if(field.Attributes["type"].Value == "SignedVarLong")
+		{
+			Write("long");
+		}
+		else if(field.Attributes["type"].Value == "UnsignedVarLong")
+		{
+			Write("long");
+		}
+		else if(field.Attributes["type"].Value == "Length")
+		{
+			Write("int");
+		}
+		else if(field.Attributes["type"].Value == "ByteArray")
+		{
+			Write("byte[]");
+		}
+		else if(field.Attributes["type"].Value == "FixedString")
+		{
+			Write("string");
+		}
+		else 
+		{
+			Write($"{field.Attributes["type"].Value}");
+		} 
+
+		WriteLine(");");
+
+	} // foreach
+
+#>
+		}
+
+	}
+
+<#
+
+} // foreach
+#>
+}
+
+<#+
+private string UpperInitial(string name)
+{ 
+	return name[0].ToString().ToUpperInvariant() + name.Substring(1).Replace(@"[]", "s"); 
+}
+
+private string CodeTypeName(string name) 
+{
+	if (name.StartsWith("ID_"))
+	{
+		name = name.Substring(3);
+	}
+	return CodeName(name, true);
+}
+
+private string CodeFieldName(string name) 
+{
+	return CodeName(name, false);
+}
+
+private string CodeName(string name, bool firstUpper = false)
+{
+    name = name.ToLowerInvariant();
+
+    string result = name;
+    bool upperCase = firstUpper;
+
+    result = string.Empty;
+    for (int i = 0; i < name.Length; i++)
+    {
+        if (name[i] == ' ' || name[i] == '_')
+        {
+            upperCase = true;
+        }
+        else
+        {
+            if ((i == 0 && firstUpper) || upperCase)
+            {
+                result += name[i].ToString().ToUpperInvariant();
+                upperCase = false;
+            }
+            else
+            {
+                result += name[i];
+            }
+        }
+    }
+
+	result = result.Replace(@"[]", "s");
+    return result;
+}
+
+public string SafeToString(XmlNode node)
+{
+	if(node == null) return "";
+
+	return node.Value;
+}
+#>

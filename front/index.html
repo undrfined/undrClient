@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>undrClient</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div id="terminal" class="draggable terminal">
+		<div id="terminal-output" class="scrollable">
+			
+		</div>
+		<div class="bottom">
+			<label class="left" for="command">></label>
+			<span class="left2"><input id="command" name="command" type="text" class="terminal-input" autofocus></span>
+		</div>
+
+	</div>
+
+	<div id="chat" class="draggable terminal">
+		<div id="messages" class="scrollable">
+			
+		</div>
+		<div class="bottom">
+			<label class="left" for="message">CHAT > </label>
+			<span class="left2"><input id="message" name="message" type="text" class="terminal-input" autofocus></span>
+		</div>
+
+	</div>
+
+	<div id="map" class="draggable">
+		<canvas id="minimap"></canvas>
+	</div>
+
+	<div id="entities" class="draggable">
+		<div class="table-wrapper">
+			<table id="entity-list">
+				<tr>
+					<th>Entity Type</th>
+					<th>Entity RID</th>
+					<th>Age</th>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<div id="players" class="draggable">
+		<div class="table-wrapper">
+			<table id="player-list">
+				<tr>
+					<th>Skin</th>
+					<th>Username</th>
+					<th>ID</th>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<div id="inventory" class="draggable">
+		<div class="table-wrapper">
+			<table id="slots">
+				<tr>
+					<td><img src="mc-icons/0.png" alt="" data-slot="9" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="10" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="11" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="12" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="13" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="14" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="15" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="16" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="17" class="slot"></td>
+				</tr>
+
+				<tr>
+					<td><img src="mc-icons/0.png" alt="" data-slot="18" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="19" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="20" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="21" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="22" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="23" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="24" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="25" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="26" class="slot"></td>
+				</tr>
+
+				<tr>
+					<td><img src="mc-icons/0.png" alt="" data-slot="27" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="28" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="29" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="30" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="31" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="32" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="33" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="34" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="35" class="slot"></td>
+				</tr>
+
+				<tr>
+					<td><img src="mc-icons/0.png" alt="" data-slot="0" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="1" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="2" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="3" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="4" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="5" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="6" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="7" class="slot"></td>
+					<td><img src="mc-icons/0.png" alt="" data-slot="8" class="slot"></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/gh/FoxInFlame/MinecraftColorCodes@master/MinecraftColorCodes.min.3.7.js
+"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/interactjs@1.3.4/dist/interact.min.js"></script>
+	<script src="client.js"></script>
+</body>
+</html>

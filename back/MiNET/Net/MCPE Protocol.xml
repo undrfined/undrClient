@@ -1,0 +1,783 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<protocol name="">
+
+	<constants>
+		<constant id="OFFLINE_MESSAGE_DATA_ID" type="byte[]" value="{ 0x00, 0xff, 0xff, 0x00, 0xfe, 0xfe, 0xfe, 0xfe, 0xfd, 0xfd, 0xfd, 0xfd, 0x12, 0x34, 0x56, 0x78 }" />
+	</constants>
+
+	<pdu namespace="raknet" id="0x00" online="false" client="true" server="true" name="ID_CONNECTED_PING">
+		<field name="SendPingTime" type="long" />
+	</pdu>
+
+	<!--
+	Send a ping to the specified unconnected system.
+	The remote system, if it is Initialized, will respond with ID_UNCONNECTED_PONG.
+	The final ping time will be encoded in the following sizeof(RakNet::TimeMS) bytes.  (Default is 4 bytes - See __GET_TIME_64BIT in RakNetTypes.h
+	-->
+	<pdu namespace="raknet" id="0x01" online="false" client="true" server="false" name="ID_UNCONNECTED_PING" size="">
+		<field name="Ping Id" type="long" exampleData="" />
+		<field name="Offline Message Data ID" type="OFFLINE_MESSAGE_DATA_ID" />
+		<field name="GUID" type="long" exampleData="" />
+	</pdu>
+
+	<pdu namespace="raknet" id="0x03" online="false" client="true" server="true" name="ID_CONNECTED_PONG">
+		<field name="SendPingTime" type="long" />
+		<field name="SendPongTime" type="long" />
+	</pdu>
+
+	<pdu namespace="raknet" id="0x04" online="false" client="false" server="true" name="ID_DETECT_LOST_CONNECTIONS">
+	</pdu>
+
+	<!--<pdu id="0xc0" online="false" client="true" server="true" name="ACK">
+		<field name="Count" type="short" />
+		<field name="Only One Sequence" type="byte" />
+		<field name="Sequence Number" type="little" />
+	</pdu>
+
+	<pdu id="0xa0" online="false" client="true" server="true" name="NAK">
+		<field name="Count" type="short" />
+		<field name="Only One Sequence" type="byte" />
+		<field name="Sequence Number" type="little" />
+	</pdu>-->
+
+	<pdu namespace="raknet" id="0x1c" client="true" server="false" name="ID_UNCONNECTED_PONG" size="">
+		<field name="Ping Id" type="long" exampleData="" />
+		<field name="Server ID" type="long" />
+		<field name="Offline Message Data ID" type="OFFLINE_MESSAGE_DATA_ID" />
+		<field name="Server Name" type="FixedString" />
+	</pdu>
+
+	<pdu namespace="raknet" id="0x05" client="true" server="false" name="ID_OPEN_CONNECTION_REQUEST_1" size="">
+		<field name="Offline Message Data ID" type="OFFLINE_MESSAGE_DATA_ID" />
+		<field name="RakNet Protocol Version" type="byte" exampleData="0x06" />
+		<!--<field name="Pad to MTU size" type="byte[]" size="0" />-->
+	</pdu>
+
+	<pdu namespace="raknet" id="0x06" client="false" server="true" name="ID_OPEN_CONNECTION_REPLY_1" size="28">
+		<field name="Offline Message Data ID" type="OFFLINE_MESSAGE_DATA_ID" />
+		<field name="Server GUID" type="long" exampleData="0x00000000372cdc9e" />
+		<field name="Server Has Security" type="byte" />
+		<!--<field name="Cookie" type="Int32" />-->
+		<field name="MTU Size" type="short" endianess="BE" />
+	</pdu>
+
+	<pdu namespace="raknet" id="0x07" client="true" server="false" name="ID_OPEN_CONNECTION_REQUEST_2" size="34">
+		<field name="Offline Message Data ID" type="OFFLINE_MESSAGE_DATA_ID" />
+		<field name="Remote Binding Address" type="IPEndPoint" />
+		<field name="MTU Size" type="short" endianess="BE"/>
+		<field name="Client GUID" type="long" />
+	</pdu>
+
+	<pdu namespace="raknet" id="0x08" client="false" server="true" name="ID_OPEN_CONNECTION_REPLY_2" size="30">
+		<field name="Offline Message Data ID" type="OFFLINE_MESSAGE_DATA_ID" />
+		<field name="Server GUID" type="long" exampleData="0x00000000372cdc9e" />
+		<field name="Client Endpoint" type="IPEndPoint" />
+		<field name="MTU Size" type="short" endianess="BE" />
+		<field name="Do security and handshake" type="byte[]" size="0" note="Ignored" />
+	</pdu>
+
+	<pdu namespace="raknet" id="0x09" online="false" client="false" server="true" name="ID_CONNECTION_REQUEST" size="33">
+		<field name="Client GUID" type="long" />
+		<field name="Timestamp" type="long" />
+		<field name="Do Security" type="byte" />
+		<!--<field name="Proof" type="byte[]" size="32" />-->
+	</pdu>
+
+	<pdu namespace="raknet" id="0x10" online="false" client="false" server="true" name="ID_CONNECTION_REQUEST_ACCEPTED">
+		<field name="System Address" type="IPEndPoint" />
+		<field name="System Index" type="short" endianess="BE"/>
+		<field name="System Addresses" type="IPEndPoint[]" size="10" />
+		<field name="Incoming Timestamp" type="long" />
+		<field name="Server Timestamp" type="long" />
+	</pdu>
+
+	<pdu namespace="raknet" id="0x13" online="false" client="true" server="false" name="ID_NEW_INCOMING_CONNECTION">
+		<field name="ClientEndpoint" type="IPEndPoint" />
+		<field name="System Addresses" type="IPEndPoint[]" size="10"/>
+		<field name="Incoming Timestamp" type="long" />
+		<field name="Server Timestamp" type="long" />
+	</pdu>
+
+	<pdu namespace="raknet" id="0x14" online="false" client="true" server="true" name="ID_NO_FREE_INCOMING_CONNECTIONS">
+		<field name="Offline Message Data ID" type="OFFLINE_MESSAGE_DATA_ID" />
+		<field name="Server GUID" type="long" exampleData="0x00000000372cdc9e" />
+	</pdu>
+
+	<pdu namespace="raknet" id="0x15" online="false" client="true" server="true" name="ID_DISCONNECTION_NOTIFICATION">
+	</pdu>
+
+	<pdu namespace="raknet" id="0x17" online="false" client="true" server="true" name="ID_CONNECTION_BANNED">
+		<field name="Offline Message Data ID" type="OFFLINE_MESSAGE_DATA_ID" />
+		<field name="Server GUID" type="long" exampleData="0x00000000372cdc9e" />
+	</pdu>
+
+	<pdu namespace="raknet" id="0x1A" online="false" client="true" server="true" name="ID_IP_RECENTLY_CONNECTED">
+		<field name="Offline Message Data ID" type="OFFLINE_MESSAGE_DATA_ID" />
+	</pdu>
+
+	<pdu id="0x01" online="false" client="true" server="false" name="MCPE_LOGIN">
+		<field name="Protocol Version" type="int" endianess="BE"/>
+		<field name="Edition" type="byte" />
+		<field name="Payload" type="ByteArray"/>
+	</pdu>
+
+	<!--
+		The three type of status are:
+
+	LOGIN_SUCCESS = 0;
+	LOGIN_FAILED_CLIENT = 1;
+	LOGIN_FAILED_SERVER = 2;
+	PLAYER_SPAWN = 3;
+	LOGIN_FAILED_INVALID_TENANT = 4;
+	LOGIN_FAILED_VANILLA_EDU = 5;
+	LOGIN_FAILED_EDU_VANILLA = 6;
+		-->
+	<pdu id="0x02" online="false" client="false" server="true" name="MCPE_PLAY_STATUS">
+		<field name="Status" type="int" endianess="BE"/>
+	</pdu>
+
+	<pdu id="0x03" online="false" client="false" server="true" name="MCPE_SERVER_TO_CLIENT_HANDSHAKE">
+		<field name="Server Public Key" type="string" />
+		<field name="Token Length" type="Length" />
+		<field name="Token" type="byte[]" size="0" />
+	</pdu>
+
+	<pdu id="0x04" online="false" client="true" server="false" name="MCPE_CLIENT_TO_SERVER_HANDSHAKE">
+	</pdu>
+
+	<pdu id="0x05" online="false" client="false" server="true" name="MCPE_DISCONNECT">
+		<field name="Hide disconnect reason" type="bool" />
+		<field name="Message" type="string" />
+	</pdu>
+
+	<pdu id="0x06" online="false" client="false" server="true" name="MCPE_RESOURCE_PACKS_INFO">
+		<field name="Must accept" type="bool" />
+		<field name="BehahaviorPackInfos" type="ResourcePackInfos" />
+		<field name="ResourcePackInfos" type="ResourcePackInfos" />
+	</pdu>
+
+	<pdu id="0x07" online="false" client="false" server="true" name="MCPE_RESOURCE_PACK_STACK">
+		<field name="Must accept" type="bool" />
+		<field name="BehaviorPackIdVersions" type="ResourcePackIdVersions" />
+		<field name="ResourcePackIdVersions" type="ResourcePackIdVersions" />
+	</pdu>
+
+	<pdu id="0x08" online="false" client="true" server="false" name="MCPE_RESOURCE_PACK_CLIENT_RESPONSE">
+		<!--
+		
+		STATUS_REFUSED = 1;
+		STATUS_SEND_PACKS = 2;
+		STATUS_HAVE_ALL_PACKS = 3;
+		STATUS_COMPLETED = 4;
+		-->
+		<field name="Response status" type="byte" />
+		<field name="ResourcePackIds" type="ResourcePackIds" />
+	</pdu>
+
+	<pdu id="0x09" online="false" client="true" server="true" name="MCPE_TEXT">
+		<!-- 
+		TYPE_RAW = 0;
+		TYPE_CHAT = 1;
+		TYPE_TRANSLATION = 2;
+		TYPE_POPUP = 3;
+		TYPE_TIP = 4;
+		TYPE_SYSTEM = 5;
+		TYPE_WHISPER = 6;
+		TYPE_ANNOUNCEMENT = 7;
+		-->
+		<field name="Type" type="byte" />
+	</pdu>
+
+	<pdu id="0x0a" online="false" client="false" server="true" name="MCPE_SET_TIME">
+		<field name="Time" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x0b" online="false" client="false" server="true" name="MCPE_START_GAME">
+		<field name="Entity ID Self" type="SignedVarLong" />
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Player Gamemode" type="SignedVarInt" />
+		<field name="Spawn" type="Vector3" />
+		<field name="Unknown 1" type="Vector2" />
+		<!-- Level Settings -->
+		<field name="Seed" type="SignedVarInt" />
+		<field name="Dimension" type="SignedVarInt" />
+		<field name="Generator" type="SignedVarInt" />
+		<field name="Gamemode" type="SignedVarInt" />
+		<field name="Difficulty" type="SignedVarInt" />
+		<field name="X" type="SignedVarInt" />
+		<field name="Y" type="SignedVarInt" />
+		<field name="Z" type="SignedVarInt" />
+		<field name="Has achievements disabled" type="bool" />
+		<field name="Day cycle stop time" type="SignedVarInt" />
+		<field name="EDU mode" type="bool" />
+		<field name="Rain level" type="float" />
+		<field name="Lightnig level" type="float" />
+		<field name="Enable commands" type="bool" />
+		<field name="Is texturepacks required" type="bool" />
+		<field name="GameRules" type="GameRules" />
+		<field name="Level ID" type="string" />
+		<field name="World name" type="string" />
+		<field name="Premium World Template Id" type="string" />
+		<field name="Unknown0" type="bool" />
+		<field name="Current Tick" type="long" />
+	</pdu>
+
+	<pdu id="0x0c" online="false" client="false" server="true" name="MCPE_ADD_PLAYER">
+		<field name="UUID" type="UUID" />
+		<field name="Username" type="string" />
+		<field name="Entity ID Self" type="SignedVarLong" />
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="X" type="float" />
+		<field name="Y" type="float" />
+		<field name="Z" type="float" />
+		<field name="Speed X" type="float" />
+		<field name="Speed Y" type="float" />
+		<field name="Speed Z" type="float" />
+		<field name="Pitch" type="float" />
+		<field name="Head Yaw" type="float" />
+		<field name="Yaw" type="float" />
+		<field name="Item" type="Item" />
+		<field name="Metadata" type="MetadataDictionary"/>
+	</pdu>
+
+
+	<!--
+		TODO: Links
+			count short
+			loop
+				link[0] long
+				link[1] long
+				link[2] byte
+		TODO: Modifiers
+			count int
+				name string
+				val1 float
+				val2 float
+		-->
+	<pdu id="0x0d" online="false" client="false" server="true" name="MCPE_ADD_ENTITY">
+		<field name="Entity ID Self" type="SignedVarLong" />
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Entity Type" type="UnsignedVarInt" />
+		<field name="X" type="float" />
+		<field name="Y" type="float" />
+		<field name="Z" type="float" />
+		<field name="Speed X" type="float" />
+		<field name="Speed Y" type="float" />
+		<field name="Speed Z" type="float" />
+		<field name="Pitch" type="float" />
+		<field name="Yaw" type="float" />
+		<field name="Attributes" type="EntityAttributes" />
+		<field name="Metadata" type="MetadataDictionary"/>
+		<field name="Links" type="Links" />
+	</pdu>
+
+	<pdu id="0x0e" online="false" client="false" server="true" name="MCPE_REMOVE_ENTITY">
+		<field name="Entity ID Self" type="SignedVarLong" />
+	</pdu>
+
+	<pdu id="0x0f" online="false" client="false" server="true" name="MCPE_ADD_ITEM_ENTITY">
+		<field name="Entity ID Self" type="SignedVarLong" />
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Item" type="Item" />
+		<field name="X" type="float" />
+		<field name="Y" type="float" />
+		<field name="Z" type="float" />
+		<field name="Speed X" type="float" />
+		<field name="Speed Y" type="float" />
+		<field name="Speed Z" type="float" />
+		<field name="Metadata" type="MetadataDictionary"/>
+	</pdu>
+
+	<pdu id="0x10" online="false" client="false" server="true" name="MCPE_ADD_HANGING_ENTITY">
+		<field name="Entity ID Self" type="SignedVarLong" />
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Coordinates" type="BlockCoordinates" />
+		<field name="Unknown" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x11" online="false" client="false" server="true" name="MCPE_TAKE_ITEM_ENTITY">
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Target" type="UnsignedVarLong" />
+	</pdu>
+
+	<pdu id="0x12" online="false" client="false" server="true" name="MCPE_MOVE_ENTITY">
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Position" type="PlayerLocation" />
+		<field name="On Ground" type="bool" />
+		<field name="Teleport" type="bool" />
+	</pdu>
+
+	<!--
+	MODE_NORMAL = 0;
+	MODE_RESET = 1;
+	MODE_ROTATION = 2;
+	-->
+	<pdu id="0x13" online="false" client="true" server="true" name="MCPE_MOVE_PLAYER">
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="X" type="float" />
+		<field name="Y" type="float" />
+		<field name="Z" type="float" />
+		<field name="Pitch" type="float" />
+		<field name="Head Yaw" type="float" />
+		<field name="Yaw" type="float" />
+		<field name="Mode" type="byte" />
+		<field name="On Ground" type="bool" />
+		<field name="Other Runtime Entity ID" type="UnsignedVarLong" />
+	</pdu>
+
+	<pdu id="0x14" online="false" client="false" server="true" name="MCPE_RIDER_JUMP">
+		<field name="Unknown" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x15" online="false" client="true" server="true" name="MCPE_REMOVE_BLOCK">
+		<field name="Coordinates" type="BlockCoordinates" />
+	</pdu>
+
+	<pdu id="0x16" online="false" client="false" server="true" name="MCPE_UPDATE_BLOCK">
+		<field name="Coordinates" type="BlockCoordinates" />
+		<field name="Block ID" type="UnsignedVarInt" />
+		<!--
+		0x00: None
+		0x01: Neighbours
+		0x02: Network
+		0x04: No Graphic
+		0x08: Priority
+		-->
+		<field name="Block Meta And Priority" type="UnsignedVarInt" />
+	</pdu>
+
+	<pdu id="0x17" online="false" client="false" server="true" name="MCPE_ADD_PAINTING">
+		<field name="Entity ID Self" type="SignedVarLong" />
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Coordinates" type="BlockCoordinates" />
+		<field name="Direction" type="SignedVarInt" />
+		<field name="Title" type="string" />
+	</pdu>
+
+	<pdu id="0x18" online="false" client="false" server="true" name="MCPE_EXPLODE">
+		<field name="Position" type="Vector3" />
+		<field name="Radius" type="SignedVarInt" />
+		<field name="Records" type="Records" />
+	</pdu>
+
+	<pdu id="0x19" online="false" client="true" server="true" name="MCPE_LEVEL_SOUND_EVENT">
+		<field name="Sound ID" type="byte" />
+		<field name="Position" type="Vector3" />
+		<field name="Extra Data" type="SignedVarInt" />
+		<field name="Pitch" type="SignedVarInt" />
+		<field name="Unknown1" type="bool" />
+		<field name="Disable Relative Volume" type="bool" />
+	</pdu>
+
+	<pdu id="0x1a" online="false" client="false" server="true" name="MCPE_LEVEL_EVENT">
+		<field name="Event ID" type="SignedVarInt" />
+		<field name="Position" type="Vector3" />
+		<field name="Data" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x1b" online="false" client="false" server="true" name="MCPE_BLOCK_EVENT">
+		<field name="Coordinates" type="BlockCoordinates" />
+		<field name="Case 1" type="SignedVarInt" />
+		<field name="Case 2" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x1c" online="false" client="true" server="true" name="MCPE_ENTITY_EVENT">
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Event ID" type="byte" />
+		<field name="Unknown" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x1d" online="false" client="false" server="true" name="MCPE_MOB_EFFECT">
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Event ID" type="byte" />
+		<field name="Effect ID" type="SignedVarInt" />
+		<field name="Amplifier" type="SignedVarInt" />
+		<field name="Particles" type="bool" />
+		<field name="Duration" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x1e" online="false" client="false" server="true" name="MCPE_UPDATE_ATTRIBUTES">
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Attributes" type="PlayerAttributes" />
+	</pdu>
+
+	<pdu id="0x1f" online="false" client="true" server="true" name="MCPE_MOB_EQUIPMENT">
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Item" type="Item" />
+		<field name="Slot" type="byte" />
+		<field name="Selected Slot" type="byte" />
+		<field name="Unknown" type="byte" />
+	</pdu>
+
+	<pdu id="0x20" online="false" client="true" server="true" name="MCPE_MOB_ARMOR_EQUIPMENT">
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Helmet" type="Item" />
+		<field name="Chestplate" type="Item" />
+		<field name="Leggings" type="Item" />
+		<field name="Boots" type="Item" />
+	</pdu>
+
+	<pdu id="0x21" online="false" client="true" server="true" name="MCPE_INTERACT">
+		<!--
+		ACTION_RIGHT_CLICK = 1;
+		ACTION_LEFT_CLICK = 2;
+		ACTION_LEAVE_VEHICLE = 3;
+		ACTION_MOUSEOVER = 4;
+		-->
+		<field name="Action ID" type="byte" />
+		<field name="Target Runtime Entity ID" type="UnsignedVarLong" />
+	</pdu>
+
+	<pdu id="0x22" online="false" client="true" server="false" name="MCPE_BLOCK_PICK_REQUEST">
+		<field name="X" type="SignedVarInt" />
+		<field name="Y" type="SignedVarInt" />
+		<field name="Z" type="SignedVarInt" />
+		<field name="Selected Slot" type="byte" />
+	</pdu>
+
+	<pdu id="0x23" online="false" client="true" server="true" name="MCPE_USE_ITEM">
+		<field name="BlockCoordinates" type="BlockCoordinates" />
+		<field name="Block ID" type="UnsignedVarInt" />
+		<field name="Face" type="SignedVarInt" />
+		<field name="FaceCoordinates" type="Vector3" />
+		<field name="PlayerPosition" type="Vector3" />
+		<field name="Slot" type="SignedVarInt"/>
+		<field name="Item" type="Item" />
+	</pdu>
+
+	<pdu id="0x24" online="false" client="true" server="false" name="MCPE_PLAYER_ACTION">
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Action ID" type="SignedVarInt" />
+		<field name="Coordinates" type="BlockCoordinates" />
+		<field name="Face" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x25" online="false" client="true" server="false" name="MCPE_ENTITY_FALL">
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Fall distance" type="float" />
+		<field name="Unknown" type="bool" />
+	</pdu>
+
+	<pdu id="0x26" online="false" client="false" server="true" name="MCPE_HURT_ARMOR">
+		<field name="Health" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x27" online="false" client="false" server="true" name="MCPE_SET_ENTITY_DATA">
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Metadata" type="MetadataDictionary"/>
+	</pdu>
+
+	<pdu id="0x28" online="false" client="false" server="true" name="MCPE_SET_ENTITY_MOTION">
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<field name="Velocity" type="Vector3" />
+	</pdu>
+
+	<pdu id="0x29" online="false" client="false" server="true" name="MCPE_SET_ENTITY_LINK">
+		<field name="Rider ID" type="UnsignedVarLong" />
+		<field name="Ridden ID" type="UnsignedVarLong" />
+		<field name="Link Type" type="byte" />
+	</pdu>
+
+	<pdu id="0x2a" online="false" client="false" server="true" name="MCPE_SET_HEALTH">
+		<field name="Health" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x2b" online="false" client="false" server="true" name="MCPE_SET_SPAWN_POSITION">
+		<field name="Spawn Type" type="SignedVarInt" />
+		<field name="Coordinates" type="BlockCoordinates" />
+		<field name="Forced" type="bool" />
+	</pdu>
+
+	<pdu id="0x2c" online="false" client="true" server="true" name="MCPE_ANIMATE">
+		<field name="Action ID" type="SignedVarInt" />
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+	</pdu>
+
+	<pdu id="0x2d" online="false" client="true" server="true" name="MCPE_RESPAWN">
+		<field name="X" type="float" />
+		<field name="Y" type="float" />
+		<field name="Z" type="float" />
+	</pdu>
+
+	<pdu id="0x2e" online="false" client="true" server="false" name="MCPE_DROP_ITEM">
+		<field name="ItemType" type="byte" />
+		<field name="Item" type="Item" />
+	</pdu>
+
+	<pdu id="0x2f" online="false" client="false" server="true" name="MCPE_INVENTORY_ACTION">
+		<field name="Action ID" type="UnsignedVarInt" />
+		<field name="Item" type="Item" />
+		<field name="Enchantment Id" type="SignedVarInt" />
+		<field name="Enchantment Level" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x30" online="false" client="false" server="true" name="MCPE_CONTAINER_OPEN">
+		<field name="Window ID" type="byte" />
+		<field name="Type" type="byte" />
+		<field name="Coordinates" type="BlockCoordinates" />
+		<field name="Unknown Runtime Entity ID" type="UnsignedVarLong" />
+	</pdu>
+
+	<pdu id="0x31" online="false" client="true" server="true" name="MCPE_CONTAINER_CLOSE">
+		<field name="Window ID" type="byte" />
+	</pdu>
+
+	<pdu id="0x32" online="false" client="true" server="true" name="MCPE_CONTAINER_SET_SLOT">
+		<field name="Window ID" type="byte" />
+		<field name="Slot" type="SignedVarInt" />
+		<field name="HotbarSlot" type="SignedVarInt" />
+		<field name="Item" type="Item" />
+		<field name="Selected Slot" type="byte" />
+	</pdu>
+
+	<pdu id="0x33" online="false" client="false" server="true" name="MCPE_CONTAINER_SET_DATA">
+		<field name="Window ID" type="byte" />
+		<field name="Property" type="SignedVarInt" />
+		<field name="Value" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x34" online="false" client="false" server="true" name="MCPE_CONTAINER_SET_CONTENT">
+		<field name="Window ID" type="UnsignedVarInt" />
+		<field name="Entity ID Self" type="SignedVarLong" />
+		<field name="Slot Data" type="ItemStacks" />
+		<field name="Hotbar Data" type="MetadataInts" />
+	</pdu>
+
+	<pdu id="0x35" online="false" client="false" server="true" name="MCPE_CRAFTING_DATA">
+		<field name="Recipes" type="Recipes" />
+	</pdu>
+
+	<pdu id="0x36" online="false" client="true" server="true" name="MCPE_CRAFTING_EVENT">
+		<field name="Window ID" type="byte" />
+		<!--
+		ENTRY_SHAPELESS = 0;
+		ENTRY_SHAPED = 1;
+		ENTRY_FURNACE = 2;
+		ENTRY_FURNACE_DATA = 3;
+		ENTRY_MULTI = 4;
+		ENTRY_SHULKER_BOX = 5;
+		-->
+		<field name="Recipe Type" type="SignedVarInt" />
+		<field name="Recipe ID" type="UUID" />
+		<field name="Input" type="ItemStacks" />
+		<field name="Result" type="ItemStacks" />
+	</pdu>
+
+	<pdu id="0x37" online="false" client="true" server="true" name="MCPE_ADVENTURE_SETTINGS">
+		<field name="Flags" type="UnsignedVarInt" />
+		<!--
+		PERMISSION_NORMAL = 0;
+		PERMISSION_OPERATOR = 1;
+		PERMISSION_HOST = 2;
+		PERMISSION_AUTOMATION = 3;
+		PERMISSION_ADMIN = 4;	
+		-->
+		<field name="User Permission" type="UnsignedVarInt" />
+	</pdu>
+
+	<pdu id="0x38" online="false" client="true" server="true" name="MCPE_BLOCK_ENTITY_DATA">
+		<field name="Coordinates" type="BlockCoordinates" />
+		<field name="NamedTag" type="Nbt"/>
+	</pdu>
+
+	<pdu id="0x39" online="false" client="true" server="false" name="MCPE_PLAYER_INPUT">
+		<field name="Motion X" type="float" />
+		<field name="Motion Z" type="float" />
+		<field name="Flag1" type="bool"/>
+		<field name="Flag2" type="bool"/>
+	</pdu>
+
+	<pdu id="0x3a" online="false" client="false" server="true" name="MCPE_FULL_CHUNK_DATA">
+		<field name="Chunk X" type="SignedVarInt" />
+		<field name="Chunk Z" type="SignedVarInt" />
+		<field name="Chunk Data" type="ByteArray" />
+	</pdu>
+
+	<pdu id="0x3b" online="false" client="false" server="true" name="MCPE_SET_COMMANDS_ENABLED">
+		<field name="Enabled" type="bool" />
+	</pdu>
+
+	<pdu id="0x3c" online="false" client="false" server="true" name="MCPE_SET_DIFFICULTY">
+		<field name="Difficulty" type="UnsignedVarInt" />
+	</pdu>
+
+	<pdu id="0x3d" online="false" client="false" server="true" name="MCPE_CHANGE_DIMENSION">
+		<field name="Dimension" type="SignedVarInt" />
+		<field name="Position" type="Vector3" />
+		<field name="Unknown" type="bool" />
+	</pdu>
+
+	<pdu id="0x3e" online="false" client="false" server="true" name="MCPE_SET_PLAYER_GAME_TYPE">
+		<field name="Gamemode" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x3f" online="false" client="false" server="true" name="MCPE_PLAYER_LIST">
+		<field name="Records" type="PlayerRecords" />
+	</pdu>
+
+	<pdu id="0x40" online="false" client="false" server="true" name="MCPE_SIMPLE_EVENT">
+	</pdu>
+
+	<pdu id="0x41" online="false" client="false" server="true" name="MCPE_EVENT">
+		<field name="Entity ID Self" type="SignedVarLong" />
+		<field name="Unk1" type="SignedVarInt" />
+		<field name="Unk2" type="byte" />
+	</pdu>
+
+	<pdu id="0x42" online="false" client="false" server="true" name="MCPE_SPAWN_EXPERIENCE_ORB">
+		<field name="Position" type="Vector3" />
+		<field name="Count" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x43" online="false" client="false" server="true" name="MCPE_CLIENTBOUND_MAP_ITEM_DATA ">
+		<field name="MapInfo" type="MapInfo" />
+	</pdu>
+
+	<pdu id="0x44" online="false" client="true" server="true" name="MCPE_MAP_INFO_REQUEST">
+		<field name="Map ID" type="SignedVarLong" />
+	</pdu>
+
+	<pdu id="0x45" online="false" client="true" server="true" name="MCPE_REQUEST_CHUNK_RADIUS">
+		<field name="Chunk Radius" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x46" online="false" client="false" server="true" name="MCPE_CHUNK_RADIUS_UPDATE">
+		<field name="Chunk Radius" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x47" online="false" client="true" server="true" name="MCPE_ITEM_FRAME_DROP_ITEM">
+		<field name="Coordinates" type="BlockCoordinates" />
+	</pdu>
+
+	<pdu id="0x48" online="false" client="false" server="true" name="MCPE_REPLACE_SELECTED_ITEM">
+		<field name="Item" type="Item" />
+	</pdu>
+
+	<pdu id="0x49" online="false" client="false" server="true" name="MCPE_GAME_RULES_CHANGED">
+		<field name="Rules" type="GameRules" />
+	</pdu>
+
+	<pdu id="0x4a" online="false" client="false" server="true" name="MCPE_CAMERA">
+	</pdu>
+
+	<pdu id="0x4b" online="false" client="false" server="true" name="MCPE_ADD_ITEM">
+		<field name="Item" type="Item" />
+	</pdu>
+
+	<pdu id="0x4c" online="false" client="false" server="true" name="MCPE_BOSS_EVENT">
+		<field name="Boss Entity ID" type="SignedVarLong" />
+		<field name="Event Type" type="UnsignedVarInt" />
+	</pdu>
+
+	<pdu id="0x4d" online="false" client="false" server="true" name="MCPE_SHOW_CREDITS">
+		<field name="Runtime Entity ID" type="UnsignedVarLong" />
+		<!--
+		STATUS_START_CREDITS = 0;
+		STATUS_END_CREDITS = 1;
+		-->
+		<field name="Status" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x4e" online="false" client="false" server="true" name="MCPE_AVAILABLE_COMMANDS">
+		<field name="Commands" type="string"  />
+		<field name="Unknown" type="string"  />
+	</pdu>
+
+	<pdu id="0x4f" online="false" client="true" server="false" name="MCPE_COMMAND_STEP">
+		<field name="Command name" type="string"  />
+		<field name="Command overload" type="string"  />
+		<field name="Unknown 1" type="UnsignedVarInt"  />
+		<field name="Current Step " type="UnsignedVarInt"  />
+		<field name="Is Output" type="bool" />
+		<field name="Client ID" type="UnsignedVarLong"  />
+		<field name="Command Input Json" type="string"  />
+		<field name="Command Output Json" type="string"  />
+		<field name="Unknown 7" type="byte"  />
+		<field name="Unknown 8" type="byte"  />
+		<field name="Entity ID Self" type="SignedVarLong"  />
+	</pdu>
+
+	<pdu id="0x50" online="false" client="true" server="false" name="MCPE_COMMAND_BLOCK_UPDATE">
+	</pdu>
+
+	<pdu id="0x51" online="false" client="false" server="true" name="MCPE_UPDATE_TRADE">
+	</pdu>
+
+	<pdu id="0x52" online="false" client="false" server="true" name="MCPE_UPDATE_EQUIP">
+	</pdu>
+
+	<pdu id="0x53" online="false" client="false" server="true" name="MCPE_RESOURCE_PACK_DATA_INFO">
+		<field name="Package ID" type="string"  />
+		<field name="Max Chunk Size " type="uint"  />
+		<field name="Chunk Count " type="uint"  />
+		<field name="Compressed Package Size " type="ulong"  />
+		<!-- SHA256 -->
+		<field name="Hash " type="string"  />
+	</pdu>
+
+	<pdu id="0x54" online="false" client="false" server="true" name="MCPE_RESOURCE_PACK_CHUNK_DATA">
+		<field name="Package ID" type="string"  />
+		<field name="Chunk Index" type="uint"  />
+		<field name="Progress" type="ulong"  />
+		<field name="Length" type="uint"  />
+		<field name="Payload" type="byte[]" size="0" />
+	</pdu>
+
+	<pdu id="0x55" online="false" client="true" server="false" name="MCPE_RESOURCE_PACK_CHUNK_REQUEST">
+		<field name="Package ID" type="string"  />
+		<field name="Chunk Index" type="uint"  />
+	</pdu>
+
+	<pdu id="0x56" online="false" client="false" server="true" name="MCPE_TRANSFER">
+		<field name="Server Address" type="string"  />
+		<field name="Port" type="ushort"  />
+	</pdu>
+
+	<pdu id="0x57" online="false" client="false" server="true" name="MCPE_PLAY_SOUND">
+		<field name="Name" type="string" />
+		<field name="Coordinates" type="BlockCoordinates" />
+		<field name="Volume" type="float" />
+		<field name="Pitch" type="float" />
+	</pdu>
+
+	<pdu id="0x58" online="false" client="false" server="true" name="MCPE_STOP_SOUND">
+		<field name="Name" type="string" />
+		<field name="Stop All" type="bool" />
+	</pdu>
+
+	<pdu id="0x59" online="false" client="false" server="true" name="MCPE_SET_TITLE">
+		<!--
+		TYPE_CLEAR_TITLE = 0;
+		TYPE_RESET_TITLE = 1;
+		TYPE_SET_TITLE = 2;
+		TYPE_SET_SUBTITLE = 3;
+		TYPE_SET_ACTIONBAR_MESSAGE = 4;
+		TYPE_SET_ANIMATION_TIMES = 5;		
+		-->
+		<field name="Type" type="SignedVarInt" />
+		<field name="Text" type="string" />
+		<field name="Fade In Time" type="SignedVarInt" />
+		<field name="Stay Time" type="SignedVarInt" />
+		<field name="Fade Out Time" type="SignedVarInt" />
+	</pdu>
+
+	<pdu id="0x5a" online="false" client="false" server="true" name="MCPE_ADD_BEHAVIOR_TREE_PACKET">
+	</pdu>
+
+	<pdu id="0x5b" online="false" client="false" server="true" name="MCPE_STRUCTURE_BLOCK_UPDATE_PACKET">
+	</pdu>
+
+	<pdu namespace="raknet" id="0xfe" online="false" client="false" server="true" name="MCPE_WRAPPER">
+		<field name="Payload" type="byte[]" size="0" />
+	</pdu>
+
+	<pdu namespace="ftl" id="0x01" online="false" client="false" server="true" name="FTL_CREATE_PLAYER">
+		<field name="Username" type="string"  />
+		<field name="ClientUuid" type="UUID"  />
+		<field name="Server Address" type="string"  />
+		<field name="Client Id" type="long"  />
+		<field name="Skin" type="Skin"  />
+	</pdu>
+
+</protocol>
